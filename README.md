@@ -24,10 +24,10 @@ This repo ships:
 - `commands/claude/perfect-goal.md` — explicit `/perfect-goal` slash command for Claude Code.
 - `commands/codex/perfect-goal.md` — same command, Codex-native.
 
-**Native plugins** (the framework callable from inside agent runtimes)
+**Agent-runtime artifacts** (the framework loaded inside agent runtimes)
 
-- `plugins/hermes/perfect-goal/` — a Hermes plugin (`plugin.yaml` + `__init__.py`) that exposes `perfect_goal` as a tool callable by hermes profiles.
-- `plugins/openclaw/perfect-goal/` — an OpenClaw plugin (`package.json` + `openclaw.plugin.json` + `index.js`) that exposes `perfect_goal` as a tool callable by openclaw agents.
+- `plugins/hermes/perfect-goal/` — a Hermes plugin (`plugin.yaml` + `__init__.py`) that exposes `perfect_goal` as a tool callable by hermes profiles. Hermes plugins natively support agent-callable tools via `ctx.register_tool`.
+- `agent-skills/openclaw/perfect-goal/` — an OpenClaw skill (`SKILL.md` + `references/`) loaded directly into the agent's context when relevant prompts appear. OpenClaw's path-loaded plugins expose HTTP routes (not agent-callable tools), so the skill-markdown approach is the direct path to surfacing perfect-goal in openclaw agent sessions.
 
 **Installer**
 
@@ -156,17 +156,22 @@ ln -s <perfect-goal-repo>/plugins/hermes/perfect-goal \
 
 See `plugins/hermes/perfect-goal/README.md` for details.
 
-### OpenClaw plugin install
+### OpenClaw agent-skill install
 
-For openclaw agents to gain the `perfect_goal` tool, symlink the plugin dir into moltbot-infra:
+For openclaw agents to gain the perfect-goal workflow as a loadable skill, symlink the skill dir into the host's openclaw skills dir + flip the enable bit:
 
 ```bash
-ln -s <perfect-goal-repo>/plugins/openclaw/perfect-goal \
-      <moltbot-infra>/plugins/perfect-goal
-# Then deploy per your openclaw plugin deploy flow (bind-mount for Mac, image rebuild for docker)
+ln -s <perfect-goal-repo>/agent-skills/openclaw/perfect-goal \
+      ~/.openclaw/skills/perfect-goal
+
+jq '.skills.entries."perfect-goal" = {"enabled": true}' \
+   ~/.openclaw/openclaw.json > /tmp/oc.tmp && mv /tmp/oc.tmp ~/.openclaw/openclaw.json
+# OpenClaw config-watcher fires on the openclaw.json change and reloads the skill
 ```
 
-See `plugins/openclaw/perfect-goal/README.md` for details.
+See `agent-skills/openclaw/perfect-goal/README.md` for details (per-agent scoping, manifest verification, layout).
+
+**Why a skill, not a plugin:** OpenClaw's path-loaded plugins expose HTTP routes — they don't surface agent-callable tools to the LLM directly (tool surfacing requires either an MCP wrapper or bundled openclaw plugin SDK). The skill-markdown path is direct: the agent loads `SKILL.md` into its context when the trigger description matches and drives the workflow itself. Same outcome, no MCP middleware.
 
 ---
 

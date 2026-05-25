@@ -38,19 +38,33 @@ for f in TEMPLATE.md METHODOLOGY.md RUBRIC.md GOAL-TYPES.md README.md; do
 done
 echo "[perfect-goal] framework docs symlinked into skill dir (relative)"
 
-# --- Plugin framework bundling ---
-# Both the hermes plugin (__init__.py) and the openclaw plugin (index.js)
-# read framework files from a 'framework/' subdir inside the plugin. Symlink
-# them in here so the plugins work out-of-the-box when their dirs get
-# symlinked into hermes-agent-enduru/plugins/ or moltbot-infra/plugins/.
-for runtime in hermes openclaw; do
-    plugin_dir="$REPO_DIR/plugins/$runtime/perfect-goal"
-    mkdir -p "$plugin_dir/framework"
+# --- Hermes plugin framework bundling ---
+# The hermes plugin (__init__.py) reads framework files from a 'framework/'
+# subdir. Symlink them in so the plugin works out-of-the-box when its dir gets
+# symlinked into hermes-agent-enduru/plugins/.
+hermes_plugin_dir="$REPO_DIR/plugins/hermes/perfect-goal"
+if [ -d "$hermes_plugin_dir" ]; then
+    mkdir -p "$hermes_plugin_dir/framework"
     for f in TEMPLATE.md METHODOLOGY.md RUBRIC.md GOAL-TYPES.md; do
-        ln -sfn "../../../../$f" "$plugin_dir/framework/$f"
+        ln -sfn "../../../../$f" "$hermes_plugin_dir/framework/$f"
     done
-    echo "[perfect-goal] $runtime plugin: framework/ bundled at $plugin_dir/framework/"
-done
+    echo "[perfect-goal] hermes plugin: framework/ bundled"
+fi
+
+# --- OpenClaw agent-skill references bundling ---
+# The openclaw skill (agent-skills/openclaw/perfect-goal/SKILL.md) references
+# files under 'references/'. Symlink them in so the skill is install-ready when
+# its dir gets symlinked into ~/.openclaw/skills/.
+openclaw_skill_dir="$REPO_DIR/agent-skills/openclaw/perfect-goal"
+if [ -d "$openclaw_skill_dir" ]; then
+    mkdir -p "$openclaw_skill_dir/references"
+    # references/<file> -> repo root <file>: up 4 levels (perfect-goal/openclaw/agent-skills/<root>)
+    for f in TEMPLATE.md METHODOLOGY.md RUBRIC.md GOAL-TYPES.md; do
+        ln -sfn "../../../../$f" "$openclaw_skill_dir/references/$f"
+    done
+    ln -sfn "../../../../examples/mission-control-unification.md" "$openclaw_skill_dir/references/EXAMPLE.md"
+    echo "[perfect-goal] openclaw agent-skill: references/ bundled"
+fi
 
 # --- Verify ---
 echo
@@ -72,8 +86,8 @@ verify "$CLAUDE_HOME/skills/hermes" "Claude Code skill (hermes)"
 verify "$CLAUDE_HOME/skills/openclaw" "Claude Code skill (openclaw)"
 verify "$CLAUDE_HOME/commands/perfect-goal.md" "Claude Code slash command"
 verify "$CODEX_HOME/prompts/perfect-goal.md" "Codex CLI slash command"
-verify "$REPO_DIR/plugins/hermes/perfect-goal/framework/TEMPLATE.md" "Hermes plugin framework bundling"
-verify "$REPO_DIR/plugins/openclaw/perfect-goal/framework/TEMPLATE.md" "OpenClaw plugin framework bundling"
+[ -d "$REPO_DIR/plugins/hermes/perfect-goal" ] && verify "$REPO_DIR/plugins/hermes/perfect-goal/framework/TEMPLATE.md" "Hermes plugin framework bundling"
+[ -d "$REPO_DIR/agent-skills/openclaw/perfect-goal" ] && verify "$REPO_DIR/agent-skills/openclaw/perfect-goal/references/TEMPLATE.md" "OpenClaw agent-skill references bundling"
 
 echo
 echo "[perfect-goal] DONE."
@@ -88,9 +102,10 @@ echo "Hermes plugin install (manual — into your hermes-agent-enduru clone):"
 echo "  ln -s $REPO_DIR/plugins/hermes/perfect-goal <hermes-agent-enduru>/plugins/perfect_goal"
 echo "  # then rebuild the gateway/customer image per your fleet update flow"
 echo
-echo "OpenClaw plugin install (manual — into your moltbot-infra clone):"
-echo "  ln -s $REPO_DIR/plugins/openclaw/perfect-goal <moltbot-infra>/plugins/perfect-goal"
-echo "  # then deploy per your openclaw plugin deploy flow"
+echo "OpenClaw agent-skill install (per openclaw host):"
+echo "  ln -s $REPO_DIR/agent-skills/openclaw/perfect-goal ~/.openclaw/skills/perfect-goal"
+echo "  jq '.skills.entries.\"perfect-goal\" = {\"enabled\": true}' ~/.openclaw/openclaw.json > /tmp/oc.tmp && mv /tmp/oc.tmp ~/.openclaw/openclaw.json"
+echo "  # gateway reloads on openclaw.json change; if not, restart via supervisor"
 echo
 echo "Uninstall (CLI integrations):"
 echo "  rm $CLAUDE_HOME/skills/{perfect-goal,hermes,openclaw}"
