@@ -1,6 +1,8 @@
 ---
 name: perfect-goal
 description: "Build a 100x-leverage goal prompt for a multi-step initiative — 13-section template, 44-point rubric, evidence-first synthesis. Use when authoring rollouts, migrations, infra changes, feature launches, refactors, or research investigations that will be handed off to another agent or future-self."
+metadata:
+  short-description: "100x-leverage goal prompt builder"
 homepage: https://github.com/apple-techie/perfect-goal
 license: MIT
 user-invocable: true
