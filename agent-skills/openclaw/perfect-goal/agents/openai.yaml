@@ -1,0 +1,4 @@
+interface:
+  display_name: "Perfect Goal"
+  short_description: "100x-leverage goal prompt builder — 13-section template + 44-point rubric"
+  default_prompt: "Use $perfect-goal to build a 100x-leverage goal prompt for: $arguments"
