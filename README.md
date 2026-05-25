@@ -8,15 +8,30 @@ Most goal prompts fail the moment a coding agent picks them up. They name an out
 
 This repo ships:
 
+**Framework core**
+
 - The **template** (`TEMPLATE.md`) — the 13-section, ~40-subsection output shape.
 - The **methodology** (`METHODOLOGY.md`) — the three-phase workflow that produces it.
-- The **rubric** (`RUBRIC.md`) — 40-point quality bar every prompt must clear.
-- The **goal-type taxonomy** (`GOAL-TYPES.md`) — which sections are required per goal type (bug / feature / migration / infra / research / refactor).
+- The **rubric** (`RUBRIC.md`) — 44-point quality bar every prompt must clear.
+- The **goal-type taxonomy** (`GOAL-TYPES.md`) — required-section matrix per goal type (bug / feature / migration / infra / research / refactor / unification).
 - **Worked examples** under `examples/`.
-- A **Claude Code skill** (`skills/perfect-goal/SKILL.md`) that auto-invokes the framework.
-- A **Claude Code slash command** (`commands/claude/perfect-goal.md`) for explicit invocation.
-- A **Codex CLI slash command** (`commands/codex/perfect-goal.md`) — same framework, Codex-native.
-- An **install script** (`install.sh`) that symlinks both into your home dirs.
+
+**Claude Code + Codex CLI integrations**
+
+- `skills/perfect-goal/SKILL.md` — the meta-skill (auto-invokes the framework on goal-shaped prompts).
+- `skills/hermes/SKILL.md` — working knowledge of the Hermes agent platform (auto-invokes when editing hermes code or planning hermes rollouts).
+- `skills/openclaw/SKILL.md` — working knowledge of the OpenClaw runtime (auto-invokes for openclaw plugin authoring or Mac boot-headless work).
+- `commands/claude/perfect-goal.md` — explicit `/perfect-goal` slash command for Claude Code.
+- `commands/codex/perfect-goal.md` — same command, Codex-native.
+
+**Native plugins** (the framework callable from inside agent runtimes)
+
+- `plugins/hermes/perfect-goal/` — a Hermes plugin (`plugin.yaml` + `__init__.py`) that exposes `perfect_goal` as a tool callable by hermes profiles.
+- `plugins/openclaw/perfect-goal/` — an OpenClaw plugin (`package.json` + `openclaw.plugin.json` + `index.js`) that exposes `perfect_goal` as a tool callable by openclaw agents.
+
+**Installer**
+
+- `install.sh` — idempotent. Symlinks all three skills + both slash commands into `~/.claude` and `~/.codex`, and bundles framework docs into the plugin dirs so they're install-ready.
 
 ---
 
@@ -122,12 +137,36 @@ This symlinks:
 If you'd rather copy than symlink:
 
 ```bash
-cp -r skills/perfect-goal ~/.claude/skills/
+cp -r skills/perfect-goal skills/hermes skills/openclaw ~/.claude/skills/
 cp commands/claude/perfect-goal.md ~/.claude/commands/
 cp commands/codex/perfect-goal.md ~/.codex/prompts/
 ```
 
-The skill becomes available automatically to Claude Code (auto-invoked when relevant). The slash commands are usable in either CLI as `/perfect-goal`.
+The skills become available automatically to Claude Code (auto-invoked when relevant prompts appear). The slash commands are usable in either CLI as `/perfect-goal`.
+
+### Hermes plugin install
+
+For hermes profiles to gain the `perfect_goal` tool, symlink the plugin dir into your hermes-agent repo:
+
+```bash
+ln -s <perfect-goal-repo>/plugins/hermes/perfect-goal \
+      <hermes-agent-enduru>/plugins/perfect_goal
+# Rebuild + roll per your fleet update flow (scripts/update-internal-fleet.sh, customer pin bump)
+```
+
+See `plugins/hermes/perfect-goal/README.md` for details.
+
+### OpenClaw plugin install
+
+For openclaw agents to gain the `perfect_goal` tool, symlink the plugin dir into moltbot-infra:
+
+```bash
+ln -s <perfect-goal-repo>/plugins/openclaw/perfect-goal \
+      <moltbot-infra>/plugins/perfect-goal
+# Then deploy per your openclaw plugin deploy flow (bind-mount for Mac, image rebuild for docker)
+```
+
+See `plugins/openclaw/perfect-goal/README.md` for details.
 
 ---
 

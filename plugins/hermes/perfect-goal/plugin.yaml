@@ -1,0 +1,24 @@
+name: perfect_goal
+version: 0.1.0
+description: |
+  Exposes the `perfect_goal` tool to hermes agents — produces a 100x-leverage
+  goal prompt via evidence-first synthesis → gap inventory → density compression.
+
+  The tool returns the Perfect Goal framework (methodology + 13-section template
+  + 44-point rubric + per-type adaptive section matrix) injected with the
+  caller's topic. The agent then uses its own LLM context to fill the template,
+  producing a goal prompt that meets the rubric.
+
+  Designed for use inside valiant-crown, hermes-fast, or any operator/customer
+  hermes profile that needs to author goals from inside a session — e.g. an
+  agent that's investigated a fleet problem and now wants to file a goal
+  capturing the gap + verification matrix.
+
+  Upstream framework: https://github.com/apple-techie/perfect-goal
+author: Andrew Peltekci
+kind: standalone
+platforms:
+  - linux
+  - darwin
+provides_tools:
+  - perfect_goal

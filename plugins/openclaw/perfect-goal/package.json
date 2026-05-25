@@ -1,0 +1,12 @@
+{
+  "name": "openclaw-perfect-goal",
+  "version": "0.1.0",
+  "description": "Exposes the Perfect Goal framework as an openclaw tool — produces 100x-leverage AI-agent goal prompts via evidence-first synthesis, gap inventory, and density compression.",
+  "type": "module",
+  "main": "index.js",
+  "openclaw": {
+    "extensions": ["./index.js"]
+  },
+  "homepage": "https://github.com/apple-techie/perfect-goal",
+  "license": "MIT"
+}
