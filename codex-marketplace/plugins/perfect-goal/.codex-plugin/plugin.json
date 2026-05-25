@@ -1,6 +1,6 @@
 {
   "name": "perfect-goal",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260525185103",
   "description": "Build 100x-leverage goal prompts with a 13-section template + 44-point rubric",
   "author": {
     "name": "Andrew Peltekci",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "Perfect Goal",
     "shortDescription": "100x-leverage goal prompt builder",
-    "longDescription": "Produce goal prompts that let an executing agent run with zero discretionary calls left. Three-phase workflow (evidence-first synthesis → gap inventory → density compression), 13-section output, 44-point rubric, 7-type adaptive section matrix.",
+    "longDescription": "Produce goal prompts that let an executing agent run with zero discretionary calls left. Three-phase workflow (evidence-first synthesis \u2192 gap inventory \u2192 density compression), 13-section output, 44-point rubric, 7-type adaptive section matrix.",
     "developerName": "Andrew Peltekci",
     "category": "Productivity",
     "capabilities": [

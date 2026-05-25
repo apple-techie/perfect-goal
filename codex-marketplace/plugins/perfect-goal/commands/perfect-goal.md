@@ -1,12 +1,13 @@
 ---
-description: "Build a 100x-leverage goal prompt — three-phase evidence synthesis, 13-section output, 44-point quality rubric. Pass a topic or 'from recent history'."
+description: "Build a 100x-leverage goal prompt — three-phase evidence synthesis, 13-section output, 44-point quality rubric."
+argument-hint: <topic or 'from recent history'>
 ---
 
 # Perfect Goal
 
 You are running the Perfect Goal framework. The goal is to produce a prompt that lets an executing agent run with **zero discretionary decisions left** — every category of decision pre-decided, every claim receipt-anchored.
 
-User input: `$arguments` (topic, or `from recent history` to derive from recent commits in this repo)
+User input: `$ARGUMENTS` (topic, or `from recent history` to derive from recent commits in this repo)
 
 ## Phase 1 — Evidence-anchored synthesis
 

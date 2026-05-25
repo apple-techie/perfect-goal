@@ -41,13 +41,14 @@ if command -v codex >/dev/null 2>&1; then
         else
             echo "[perfect-goal] codex marketplace 'perfect-goal' already registered"
         fi
-        # Install the plugin (no-op if already installed)
-        if ! codex plugin list 2>/dev/null | grep -q "^perfect-goal@perfect-goal.*installed"; then
-            codex plugin add perfect-goal@perfect-goal 2>&1 | sed 's/^/[perfect-goal]   /'
-        else
-            echo "[perfect-goal] codex plugin 'perfect-goal' already installed"
+        # Bump the cachebuster suffix (per codex plugin-creator docs — codex caches
+        # plugins by version, so unchanged versions serve stale files). Then re-add.
+        CACHEBUSTER_SCRIPT="$CLAUDE_HOME/../.codex/skills/.system/plugin-creator/scripts/update_plugin_cachebuster.py"
+        if [ -f "$CACHEBUSTER_SCRIPT" ]; then
+            python3 "$CACHEBUSTER_SCRIPT" "$MARKETPLACE_PATH/plugins/perfect-goal" 2>&1 | sed 's/^/[perfect-goal]   /'
         fi
-        echo "[perfect-goal] NOTE: restart codex to see Perfect Goal in the Enable/Disable Skills picker"
+        codex plugin add perfect-goal@perfect-goal 2>&1 | sed 's/^/[perfect-goal]   /'
+        echo "[perfect-goal] NOTE: open a NEW codex thread (not just restart) to pick up the slash command + skill"
     fi
 else
     echo "[perfect-goal] codex CLI not found, skipping codex plugin install (run: bash install.sh after installing codex)"
