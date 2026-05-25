@@ -1,0 +1,36 @@
+{
+  "name": "perfect-goal",
+  "version": "0.1.0",
+  "description": "Build 100x-leverage goal prompts with a 13-section template + 44-point rubric",
+  "author": {
+    "name": "Andrew Peltekci",
+    "url": "https://github.com/apple-techie"
+  },
+  "homepage": "https://github.com/apple-techie/perfect-goal",
+  "repository": "https://github.com/apple-techie/perfect-goal",
+  "license": "MIT",
+  "keywords": [
+    "goal",
+    "planning",
+    "prompt",
+    "rubric",
+    "framework"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Perfect Goal",
+    "shortDescription": "100x-leverage goal prompt builder",
+    "longDescription": "Produce goal prompts that let an executing agent run with zero discretionary calls left. Three-phase workflow (evidence-first synthesis → gap inventory → density compression), 13-section output, 44-point rubric, 7-type adaptive section matrix.",
+    "developerName": "Andrew Peltekci",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/apple-techie/perfect-goal",
+    "defaultPrompt": [
+      "Build a perfect goal for X",
+      "Use perfect-goal to plan this rollout",
+      "Author a goal prompt for the migration"
+    ]
+  }
+}

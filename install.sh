@@ -29,15 +29,29 @@ mkdir -p "$CODEX_HOME/prompts"
 ln -sfn "$REPO_DIR/commands/codex/perfect-goal.md" "$CODEX_HOME/prompts/perfect-goal.md"
 echo "[perfect-goal] codex prompt (legacy): $CODEX_HOME/prompts/perfect-goal.md -> $REPO_DIR/commands/codex/perfect-goal.md"
 
-# Codex 0.133+ surfaces slash commands via skills/<name>/ (not prompts/) AND
-# does NOT follow symlinks for skill discovery — bundled skills in .system/
-# are all real dirs. Use cp -RL to materialize a real copy (dereferences our
-# in-repo references/ symlinks too). Re-running install.sh refreshes the copy.
-mkdir -p "$CODEX_HOME/skills"
-rm -rf "$CODEX_HOME/skills/perfect-goal"
-cp -RL "$REPO_DIR/agent-skills/openclaw/perfect-goal" "$CODEX_HOME/skills/perfect-goal"
-echo "[perfect-goal] codex skill: $CODEX_HOME/skills/perfect-goal (real copy)"
-echo "[perfect-goal] NOTE: restart codex (kill any running session) to pick up the new skill"
+# Codex 0.133+ surfaces skills via PLUGINS in a marketplace, not loose files
+# in ~/.codex/skills/. Register the local marketplace + install the plugin via
+# the codex CLI. Both operations are idempotent.
+if command -v codex >/dev/null 2>&1; then
+    MARKETPLACE_PATH="$REPO_DIR/codex-marketplace"
+    if [ -d "$MARKETPLACE_PATH" ]; then
+        # Register the marketplace (no-op if already registered)
+        if ! codex plugin marketplace list 2>/dev/null | grep -q "^perfect-goal "; then
+            codex plugin marketplace add "$MARKETPLACE_PATH" 2>&1 | sed 's/^/[perfect-goal]   /'
+        else
+            echo "[perfect-goal] codex marketplace 'perfect-goal' already registered"
+        fi
+        # Install the plugin (no-op if already installed)
+        if ! codex plugin list 2>/dev/null | grep -q "^perfect-goal@perfect-goal.*installed"; then
+            codex plugin add perfect-goal@perfect-goal 2>&1 | sed 's/^/[perfect-goal]   /'
+        else
+            echo "[perfect-goal] codex plugin 'perfect-goal' already installed"
+        fi
+        echo "[perfect-goal] NOTE: restart codex to see Perfect Goal in the Enable/Disable Skills picker"
+    fi
+else
+    echo "[perfect-goal] codex CLI not found, skipping codex plugin install (run: bash install.sh after installing codex)"
+fi
 
 # --- Reference files (framework docs accessible from inside the skill dir) ---
 # Symlink the top-level framework docs into the skill dir so the skill's
@@ -96,7 +110,9 @@ verify "$CLAUDE_HOME/skills/hermes" "Claude Code skill (hermes)"
 verify "$CLAUDE_HOME/skills/openclaw" "Claude Code skill (openclaw)"
 verify "$CLAUDE_HOME/commands/perfect-goal.md" "Claude Code slash command"
 verify "$CODEX_HOME/prompts/perfect-goal.md" "Codex CLI prompt (legacy)"
-[ -d "$CODEX_HOME/skills/perfect-goal" ] && [ -f "$CODEX_HOME/skills/perfect-goal/SKILL.md" ] && [ -f "$CODEX_HOME/skills/perfect-goal/agents/openai.yaml" ] && echo "  OK   Codex CLI skill (0.133+, real-dir copy)" || echo "  FAIL Codex CLI skill — SKILL.md or agents/openai.yaml missing in $CODEX_HOME/skills/perfect-goal"
+if command -v codex >/dev/null 2>&1; then
+    codex plugin list 2>/dev/null | grep -q "^perfect-goal@perfect-goal.*installed, enabled" && echo "  OK   Codex CLI plugin (installed + enabled)" || echo "  FAIL Codex CLI plugin not installed/enabled"
+fi
 [ -d "$REPO_DIR/plugins/hermes/perfect-goal" ] && verify "$REPO_DIR/plugins/hermes/perfect-goal/framework/TEMPLATE.md" "Hermes plugin framework bundling"
 [ -d "$REPO_DIR/agent-skills/openclaw/perfect-goal" ] && verify "$REPO_DIR/agent-skills/openclaw/perfect-goal/references/TEMPLATE.md" "OpenClaw agent-skill references bundling"
 

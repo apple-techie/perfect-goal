@@ -1,0 +1,20 @@
+{
+  "name": "perfect-goal",
+  "interface": {
+    "displayName": "Perfect Goal"
+  },
+  "plugins": [
+    {
+      "name": "perfect-goal",
+      "source": {
+        "source": "local",
+        "path": "./plugins/perfect-goal"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
