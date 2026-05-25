@@ -29,12 +29,14 @@ mkdir -p "$CODEX_HOME/prompts"
 ln -sfn "$REPO_DIR/commands/codex/perfect-goal.md" "$CODEX_HOME/prompts/perfect-goal.md"
 echo "[perfect-goal] codex prompt (legacy): $CODEX_HOME/prompts/perfect-goal.md -> $REPO_DIR/commands/codex/perfect-goal.md"
 
-# Codex 0.133+ surfaces slash commands via skills/ (not prompts/). Symlink the
-# same SKILL.md that openclaw uses into codex's skills dir. Codex needs a
-# restart to pick up new skills (per its skill-installer convention).
+# Codex 0.133+ surfaces slash commands via skills/<name>/ (not prompts/) AND
+# does NOT follow symlinks for skill discovery — bundled skills in .system/
+# are all real dirs. Use cp -RL to materialize a real copy (dereferences our
+# in-repo references/ symlinks too). Re-running install.sh refreshes the copy.
 mkdir -p "$CODEX_HOME/skills"
-ln -sfn "$REPO_DIR/agent-skills/openclaw/perfect-goal" "$CODEX_HOME/skills/perfect-goal"
-echo "[perfect-goal] codex skill: $CODEX_HOME/skills/perfect-goal -> $REPO_DIR/agent-skills/openclaw/perfect-goal"
+rm -rf "$CODEX_HOME/skills/perfect-goal"
+cp -RL "$REPO_DIR/agent-skills/openclaw/perfect-goal" "$CODEX_HOME/skills/perfect-goal"
+echo "[perfect-goal] codex skill: $CODEX_HOME/skills/perfect-goal (real copy)"
 echo "[perfect-goal] NOTE: restart codex (kill any running session) to pick up the new skill"
 
 # --- Reference files (framework docs accessible from inside the skill dir) ---
@@ -94,7 +96,7 @@ verify "$CLAUDE_HOME/skills/hermes" "Claude Code skill (hermes)"
 verify "$CLAUDE_HOME/skills/openclaw" "Claude Code skill (openclaw)"
 verify "$CLAUDE_HOME/commands/perfect-goal.md" "Claude Code slash command"
 verify "$CODEX_HOME/prompts/perfect-goal.md" "Codex CLI prompt (legacy)"
-verify "$CODEX_HOME/skills/perfect-goal" "Codex CLI skill (0.133+)"
+[ -d "$CODEX_HOME/skills/perfect-goal" ] && [ -f "$CODEX_HOME/skills/perfect-goal/SKILL.md" ] && [ -f "$CODEX_HOME/skills/perfect-goal/agents/openai.yaml" ] && echo "  OK   Codex CLI skill (0.133+, real-dir copy)" || echo "  FAIL Codex CLI skill — SKILL.md or agents/openai.yaml missing in $CODEX_HOME/skills/perfect-goal"
 [ -d "$REPO_DIR/plugins/hermes/perfect-goal" ] && verify "$REPO_DIR/plugins/hermes/perfect-goal/framework/TEMPLATE.md" "Hermes plugin framework bundling"
 [ -d "$REPO_DIR/agent-skills/openclaw/perfect-goal" ] && verify "$REPO_DIR/agent-skills/openclaw/perfect-goal/references/TEMPLATE.md" "OpenClaw agent-skill references bundling"
 
